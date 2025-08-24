@@ -1,8 +1,6 @@
 import java.io.IOException;
 
-
-
-public class Main {
+public class App {
     public static void main(String[] args) throws IOException {
         Attributs attributs = new Attributs(args);
         attributs.setArgs();
@@ -18,12 +16,6 @@ public class Main {
         }
 
         files.writeDataToFiles(sorting.getWorkerInDepartment());
-     //   E:\fileForRider.txt --sort=name --order=desc -o=file --path=E:\IdeaProjects\fileOutResult.txt
-      //  --sort=salary --order=asc --stat -o=file --path=E:\IdeaProjects\fileOutResult.txt
-      //  --sort=salary --order=asc --stat -o=file --path=output\statistica\statistics.txt
-      //  --sort=salary --order=asc --stat --o=file --path=output\statistica\statistics.txt false
-      //  --sort=salary --order=asc --stat -o=file --path=output\statistica\statistics.txt true
-        //--sort=salary --order=asc --stat -o=file --path=output\statistica\statis/tics.txt false
-        //--sort=salary --order=asc --stat true
+
     }
 }

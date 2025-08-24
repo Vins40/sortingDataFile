@@ -11,7 +11,6 @@ public class Utils {
         }
 
     }
-
     public static boolean isInteger(String number) {
         try {
             return Integer.parseInt(number) > 0;
