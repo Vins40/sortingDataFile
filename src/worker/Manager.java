@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Manager {
-    private String status;
-    private Integer identifier;
-    private String name;
-    private String salary;
-    private String department;
-    private List<Employee> listEmployee = new ArrayList<>();
+    private final String status;
+    private final Integer identifier;
+    private final String name;
+    private final String salary;
+    private final String department;
+    private final List<Employee> listEmployee = new ArrayList<>();
 
     public Manager(Integer identifier, String name, String salary, String department) {
         this.status = "Manager";

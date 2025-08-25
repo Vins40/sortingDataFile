@@ -2,21 +2,21 @@ import worker.Employee;
 import worker.Manager;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 public class SortingData {
-    private List<String> employeeList;
-    private Map<String, String> managerList;
-    private List<String> value_args;
-    private List<Manager> workerInDepartment = new ArrayList<>();
+    private final List<String> employeeList;
+    private final Map<String, String> managerList;
+    private final List<String> valueArgs;
+    private final List<Manager> workerInDepartment = new ArrayList<>();
+    private final List<Integer> controlList = new ArrayList<>();
 
-    private List<Integer> controlList = new ArrayList<>();
-
-    public SortingData(Map<String, String> managerList, List<String> employeeList, List<String> value_args) {
+    public SortingData(Map<String, String> managerList, List<String> employeeList, List<String> valueArgs) {
         this.employeeList = employeeList;
         this.managerList = managerList;
-        this.value_args = value_args;
+        this.valueArgs = valueArgs;
     }
 
     public void sortingWorkerToDepartment() {
@@ -31,34 +31,26 @@ public class SortingData {
                 }
             }
             workerInDepartment.add(manager);
-            if(value_args.size()!=0)
-            {
-                if(value_args.contains(Attributs.NAME))
-                {
-                    if(value_args.contains(Attributs.DESС)){
-                        manager.getListEmployee().sort((s1,s2)->s2.getName().compareTo(s1.getName()));
-                    }
-                    else {
-                        manager.getListEmployee().sort((s1,s2)->s1.getName().compareTo(s2.getName()));
-                    }
-                }
-                else if (value_args.contains(Attributs.SALARY))
-                {
-                    if(value_args.contains(Attributs.DESС)){
-                        manager.getListEmployee().sort((s1,s2)->s2.getSalary().compareTo(s1.getSalary()));
-                    }
-                    else {
-                        manager.getListEmployee().sort((s1,s2)->s1.getSalary().compareTo(s2.getSalary()));
-                    }
-                }
-            }
+            if (!valueArgs.isEmpty()) sortEmployeeInList(manager);
         }
-
+    }
+    private void sortEmployeeInList(Manager manager) {
+        List<Employee> employees = manager.getListEmployee();
+        if (valueArgs.contains(Attributs.NAME)) {
+            boolean containsDesc = valueArgs.contains(Attributs.DESС);
+            employees.sort(containsDesc ? (s1, s2) -> s2.getName().compareTo(s1.getName()) :
+                Comparator.comparing(Employee::getName));
+        } else if (valueArgs.contains(Attributs.SALARY)) {
+            boolean containsDesc = valueArgs.contains(Attributs.DESС);
+            employees.sort(containsDesc ? (s1, s2) -> s2.getSalary().compareTo(s1.getSalary()) :
+                Comparator.comparing(Employee::getSalary));
+        }
     }
 
     public List<Manager> getWorkerInDepartment() {
         return workerInDepartment;
     }
+
     public List<Integer> getControlList() {
         return controlList;
     }

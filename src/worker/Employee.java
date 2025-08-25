@@ -1,11 +1,11 @@
 package worker;
 
 public class Employee {
-    private String status;
-    private Integer identifier;
-    private String name;
-    private String salary;
-    private Integer identifier_m;
+    private final String status;
+    private final Integer identifier;
+    private final String name;
+    private final String salary;
+    private final Integer identifier_m;
 
 
     public Employee(Integer identifier, String name, String salary, Integer identifier_m) {

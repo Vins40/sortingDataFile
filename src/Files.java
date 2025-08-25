@@ -8,18 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 public class Files {
-    private List<String> filesList = new ArrayList();
-    private List<String> employeeList = new ArrayList();
-    private Map<String, String> managerList = new HashMap<>();
-    private List<String> departmentList = new ArrayList<>();
-    private List<String> errorDataList = new ArrayList();
-    public static final String ERROR_CREATING_FOLDER = "Error creating folder! Please check the parameter path";
-    public static final String ERROR_WRITING_TO_FILE = "Error writing to the file! ";
-    public static final String ERROR_CREATING_FILE = "Error creating the file! Please check the parameter path!";
-    private final String PREFIX = ".sb";
-    private boolean isDataFiles = false;
+    private final List<String> filesList = new ArrayList();
+    private final List<String> employeeList = new ArrayList();
+    private final Map<String, String> managerList = new HashMap<>();
+    private final List<String> departmentList = new ArrayList<>();
+    private final List<String> errorDataList = new ArrayList();
     private static final String filesError = "Files not found";
-    private String userPatch = "";
+    private static final String errorCreatingFolder = "Error creating folder! Please check the parameter path";
+    private static final String errorWritingToFile = "Error writing to the file! ";
+    private static final String errorCreatingFile = "Error creating the file! Please check the parameter path!";
 
     public static boolean isPathRight(String path) {
 
@@ -40,7 +37,7 @@ public class Files {
             boolean newDirectory = file.mkdirs();
 
             if (!newDirectory) {
-                System.out.println(ERROR_CREATING_FOLDER);
+                System.out.println(errorCreatingFolder);
                 return false;
             }
         }
@@ -48,7 +45,7 @@ public class Files {
     }
 
     public void getListFiles() {
-        userPatch = System.getProperty("user.dir");
+        String userPatch = System.getProperty("user.dir");
         File file = new File(userPatch);
         if (file.exists()) {
             File[] listfiles = file.listFiles();
@@ -59,7 +56,7 @@ public class Files {
             }
         }
         if (filesList.size() > 0) {
-            isDataFiles = true;
+            boolean isDataFiles = true;
         } else {
             System.out.println(filesError);
         }
@@ -67,40 +64,68 @@ public class Files {
 
     public void readFileContents() throws IOException {
         getListFiles();
-        for (int i = 0; i < filesList.size(); i++) {
-
-            BufferedReader reader = new BufferedReader(new FileReader(filesList.get(i)));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parsingLine = line.trim().split(",");
-                if (parsingLine.length == 5) {
-                    if (Utils.isManager(parsingLine[0]) && Utils.isInteger(parsingLine[1].trim()) && !Utils.isNumber(parsingLine[2]) && Utils.isNumber(parsingLine[3].trim()) && !Utils.isNumber(parsingLine[4])) {
-                        if (!departmentList.contains(parsingLine[4].trim())) {
-                            managerList.put(parsingLine[4].trim(), line.trim());
-                            departmentList.add(parsingLine[4].trim());
-                        } else {
-                            if (managerList.containsKey(parsingLine[4])) {
-                                errorDataList.add(managerList.get(parsingLine[4]));
-                                managerList.remove(parsingLine[4]);
-                            }
-                            errorDataList.add(line.trim());
-                        }
-
-                    } else if (Utils.isEmployee(parsingLine[0].trim()) && Utils.isInteger(parsingLine[1].trim()) && !Utils.isNumber(parsingLine[2]) && Utils.isNumber(parsingLine[3].trim()) && Utils.isNumber(parsingLine[4].trim())) {
-                        employeeList.add(line.trim());
-                    } else {
-                        errorDataList.add(line.trim());
-                    }
-                } else {
-                    errorDataList.add(line.trim());
+        for (String fileName : filesList) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    parseLine(line.trim());
                 }
             }
-            reader.close();
         }
+    }
+
+    private void parseLine(String line) {
+        String[] parsingLine = line.split(",");
+        if (parsingLine.length != 5) {
+            errorDataList.add(line);
+            return;
+        }
+        for (int i = 0; i < parsingLine.length; i++) {
+            parsingLine[i] = parsingLine[i].trim();
+        }
+        if (isValidManager(parsingLine)) {
+            checkToManagerFromOneDepartment(parsingLine, line);
+
+        } else if (isValidEmployee(parsingLine)) {
+            employeeList.add(line.trim());
+        } else {
+            errorDataList.add(line);
+        }
+    }
+
+    private void checkToManagerFromOneDepartment(String[] parsingLine, String line) {
+        String department = parsingLine[4];
+        if (!departmentList.contains(department)) {
+            managerList.put(department, line);
+            departmentList.add(department);
+        } else {
+            String existManager = managerList.remove(department);
+            if (existManager != null) {
+                errorDataList.add(existManager);
+            }
+            errorDataList.add(line);
+        }
+    }
+
+    private boolean isValidManager(String[] parsingLine) {
+        return Utils.isManager(parsingLine[0]) &&
+            Utils.isInteger(parsingLine[1].trim()) &&
+            !Utils.isNumber(parsingLine[2]) &&
+            Utils.isNumber(parsingLine[3].trim()) &&
+            !Utils.isNumber(parsingLine[4]);
+    }
+
+    private boolean isValidEmployee(String[] parsingLine) {
+        return Utils.isEmployee(parsingLine[0].trim()) &&
+            Utils.isInteger(parsingLine[1].trim()) &&
+            !Utils.isNumber(parsingLine[2]) &&
+            Utils.isNumber(parsingLine[3].trim()) &&
+            Utils.isNumber(parsingLine[4].trim());
     }
 
     public void writeDataToFiles(List<Manager> managerList) {
         for (Manager manager : managerList) {
+            String PREFIX = ".sb";
             String fileName = manager.getDepartment() + PREFIX;
             writeDepartmentToFile(manager, fileName);
         }
@@ -115,7 +140,7 @@ public class Files {
 
             writer.write(String.format("%s,%s,%s,%s\n", manager.getStatus(), manager.getIdentifier(), manager.getName(), manager.getSalary()));
             for (Employee employee : manager.getListEmployee()) {
-                writer.write(employee.toString()+'\n');
+                writer.write(employee.toString() + '\n');
             }
             writer.close();
         } catch (IOException e) {
@@ -134,7 +159,7 @@ public class Files {
             }
             writer.close();
         } catch (IOException e) {
-            System.out.println(ERROR_CREATING_FILE + file.getName());
+            System.out.println(errorCreatingFile + file.getName());
         }
     }
 
@@ -145,10 +170,10 @@ public class Files {
             try {
                 boolean isCreated = newFoldr.createNewFile();
                 if (!isCreated) {
-                    System.out.println(ERROR_CREATING_FILE);
+                    System.out.println(errorCreatingFile);
                 }
             } catch (IOException e) {
-                System.out.println(ERROR_CREATING_FILE);
+                System.out.println(errorCreatingFile);
                 return false;
             }
         }
@@ -161,13 +186,13 @@ public class Files {
             File file = new File(path);
             try {
                 FileWriter writer = new FileWriter(file);
-                writer.write("department, min, max, mid \n");
+                writer.write(Statistics.fieldStatistic + '\n');
                 for (String line : listStatistic) {
                     writer.write("\n" + line);
                 }
                 writer.close();
             } catch (IOException e) {
-                System.out.println(ERROR_WRITING_TO_FILE + path.substring(path.lastIndexOf('\\') + 1));
+                System.out.println(errorWritingToFile + path.substring(path.lastIndexOf('\\') + 1));
             }
         }
     }

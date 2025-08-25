@@ -3,111 +3,142 @@ import java.util.List;
 
 public class Attributs {
 
-    private String[] args;
-    private final String separator = "=";
-    private final String dash = "-";
-    private final String toDash = "--";
-    private List<String> value_args_sort = new ArrayList<>();
-    private String value_args_path;
-    public static final String SORT = "sort";
-    private final String SORT_Short = "s";
-    public static final String ORDER = "order";
-    public static final String OUTPUT = "output";
-    private final String OUTPUT_Short = "o";
     public static final String PATH = "path";
-    private static final String STAT = "stat";
-    public static final String NAME = "name";
-    public static final String SALARY = "salary";
-    private final String ASC = "asc";
-    public static final String DESС = "desc";
-    public static final String FILE = "file";
-    public static final String CONSOLE = "console";
-
-    private final String errorInput = "Data entry error: ";
-    private final String missingParameter = "Parameter missing ";
-    private final String noStatError = "Unknown parameter: ";
-    public static boolean argSort = false;
     public static boolean argStat = false;
-
-    public static boolean argOutputFile = false;
-
-    public Attributs(String[] args) {
-        this.args = args;
-    }
-
-
-    public void setArgs() {
+    static final String NAME = "name";
+    static final String SALARY = "salary";
+    static final String DESС = "desc";
+    private static final String SORT = "sort";
+    private static final String ORDER = "order";
+    private static final String OUTPUT = "output";
+    private static final String FILE = "file";
+    private static final String CONSOLE = "console";
+    private static final String STAT = "stat";
+    private static final String separator = "=";
+    private static final String dash = "-";
+    private static final String toDash = "--";
+    private static final String errorInput = "Data entry error: ";
+    private static final String missingParameter = "Parameter missing ";
+    private static final String noStatError = "Unknown parameter: ";
+    private final List<String> valueArgsSort = new ArrayList<>();
+    private String valueArgsPath;
+    private boolean argSort = false;
+    private boolean argOutputFile = false;
+    public void setArgs(String[] args) {
         for (int i = 0; i <= args.length - 1; i++) {
-            if (args[i].startsWith(toDash + SORT + separator) || args[i].startsWith(dash + SORT_Short + separator)) {
-
-                String parameter = attributValue(args[i]);
-                if (parameter.equals(NAME) || parameter.equals(SALARY)) {
-                    value_args_sort.add(parameter);
-                    argSort = true;
+            String currentParameter = args[i];
+            try {
+                if (isSortArgument(currentParameter)) {
+                    getSortArgument(currentParameter);
+                } else if (isOrderArrgument(currentParameter)) {
+                    getOrderArgument(currentParameter);
+                } else if (isStatArgument(currentParameter)) {
+                    argStat = true;
+                } else if (isOutputArgument(currentParameter)) {
+                    getOutputArgument(currentParameter);
+                } else if (isPathArgument(currentParameter)) {
+                    getPathArgument(currentParameter);
                 } else {
-                    System.out.println(errorInput + SORT);
+                    gettingUnknownArgument(currentParameter);
                 }
-
-            } else if (args[i].startsWith(toDash + ORDER + separator)) {
-                if (argSort) {
-                    String parameter = attributValue(args[i]);
-                    if (parameter.equals(ASC) || parameter.equals(DESС)) {
-                        value_args_sort.add(parameter);
-                    } else {
-                        System.out.println(errorInput + ORDER);
-                    }
-                } else {
-                    System.out.println(errorInput + missingParameter + SORT);
-                }
-            } else if (args[i].startsWith(toDash + STAT)) {
-                argStat = true;
-            } else if (args[i].startsWith(toDash + OUTPUT + separator) || args[i].startsWith(dash + OUTPUT_Short + separator)) {
-                if (isStatTrue(args[i])) {
-                    String parametr = attributValue(args[i]);
-                    if (parametr.equals(CONSOLE) || parametr.equals(FILE)) {
-                        if (parametr.equals(FILE)) argOutputFile = true;
-                    } else {
-                        System.out.println(errorInput + OUTPUT);
-                        argStat=false;
-                    }
-                }
-            } else if (args[i].startsWith(toDash + PATH + separator)) {
-                if (isStatTrue(args[i])) {
-                    String path = attributValue(args[i]);
-                    if (argOutputFile) {
-                        value_args_path=path;
-                    }
-                    else
-                    {
-                        System.out.println(missingParameter + OUTPUT);
-                        System.out.println(noStatError + args[i]);
-                        argStat=false;
-                    }
-
-                }
-            }
-            else {
-                System.out.println(noStatError + args[i]);
-                if(argStat) argStat=false;
+            } catch (Exception e) {
+                System.out.println(errorInput + currentParameter);
             }
         }
-        if(argOutputFile&&getValue_args_path()==null)
-        {
-            System.out.println(missingParameter + PATH);
-            argStat=false;
+        validateFinalState();
+    }
+
+    private boolean isSortArgument(String currentParameter) {
+        String SORT_Short = "s";
+        return currentParameter.startsWith(toDash + SORT + separator) ||
+            currentParameter.startsWith(dash + SORT_Short + separator);
+    }
+
+    private boolean isOrderArrgument(String currentParameter) {
+        return currentParameter.startsWith(toDash + ORDER + separator);
+    }
+
+    private boolean isStatArgument(String currentParameter) {
+        return currentParameter.startsWith(toDash + STAT);
+    }
+
+    private boolean isOutputArgument(String currentParameter) {
+        String OUTPUT_Short = "o";
+        return currentParameter.startsWith(toDash + OUTPUT + separator) ||
+            currentParameter.startsWith(dash + OUTPUT_Short + separator);
+    }
+
+    private boolean isPathArgument(String currentParameter) {
+        return currentParameter.startsWith(toDash + PATH + separator);
+    }
+
+    private void getSortArgument(String currentParameter) {
+        String parameter = attributValue(currentParameter);
+        if (NAME.equals(parameter) || SALARY.equals(parameter)) {
+            valueArgsSort.add(parameter);
+            argSort = true;
+        } else {
+            System.out.println(errorInput + SORT);
         }
     }
 
-    private boolean isStatTrue(String line) {
+    private void getOrderArgument(String currentParameter) {
+        if (!argSort) {
+            System.out.println(errorInput + missingParameter + SORT);
+            return;
+        }
+        String ASC = "asc";
+        String parameter = attributValue(currentParameter);
 
+        if (ASC.equals(parameter) || DESС.equals(parameter)) {
+            valueArgsSort.add(parameter);
+        } else {
+            System.out.println(errorInput + ORDER);
+        }
+    }
+
+    private void getOutputArgument(String currentParameter) {
+        if (!isStat(currentParameter)) return;
+        String parameter = attributValue(currentParameter);
+        if (CONSOLE.equals(parameter) || FILE.equals(parameter)) {
+            argOutputFile = FILE.equals(parameter);
+        } else {
+            System.out.println(errorInput + OUTPUT);
+            argStat = false;
+        }
+    }
+
+    private void getPathArgument(String currentParameter) {
+        if (!isStat(currentParameter)) return;
+        {
+            if (!argOutputFile) {
+                System.out.println(missingParameter + OUTPUT);
+                System.out.println(noStatError + currentParameter);
+                argStat = false;
+            }
+            valueArgsPath = attributValue(currentParameter);
+        }
+    }
+
+    private void gettingUnknownArgument(String currentParameter) {
+        System.out.println(noStatError + currentParameter);
+        argStat = false;
+    }
+
+    private void validateFinalState() {
+        if (argOutputFile && getValueArgsPath() == null) {
+            System.out.println(missingParameter + PATH);
+            argStat = false;
+        }
+    }
+
+    private boolean isStat(String line) {
         if (argStat) {
             return true;
         } else {
             System.out.println(noStatError + line);
-            argStat=false;
-        return false;
+            return false;
         }
-
     }
 
     private String attributValue(String s) {
@@ -115,11 +146,11 @@ public class Attributs {
         return s.substring(valueSeparator + 1);
     }
 
-    public List<String> getValue_args_sort() {
-        return value_args_sort;
+    public List<String> getValueArgsSort() {
+        return valueArgsSort;
     }
 
-    public String getValue_args_path() {
-        return value_args_path;
+    public String getValueArgsPath() {
+        return valueArgsPath;
     }
 }

@@ -9,8 +9,8 @@ public class Utils {
         } catch (NumberFormatException e) {
             return false;
         }
-
     }
+
     public static boolean isInteger(String number) {
         try {
             return Integer.parseInt(number) > 0;
