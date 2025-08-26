@@ -7,24 +7,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Files {
+public class MethodsForWorkWitchFiles {
     private final List<String> filesList = new ArrayList();
     private final List<String> employeeList = new ArrayList();
     private final Map<String, String> managerList = new HashMap<>();
     private final List<String> departmentList = new ArrayList<>();
     private final List<String> errorDataList = new ArrayList();
+
     private static final String filesError = "Files not found";
-    private static final String errorCreatingFolder = "Error creating folder! Please check the parameter path";
-    private static final String errorWritingToFile = "Error writing to the file! ";
+    private static final String errorCreatingFolder = "Error creating folder! Please check the parameter path ";
+    private static final String errorWritingToFile = "Error writing to the file!  ";
     private static final String errorCreatingFile = "Error creating the file! Please check the parameter path!";
+    private static final String errorDeleteDirectory = "Warning: Cannot delete directory: ";
 
     public static boolean isPathRight(String path) {
+
 
         File file = new File(path);
         if (file.exists()) {
             return true;
         } else {
-            if (createdDirectory(path) && createdFile(path)) {
+            if (createdDirectory(path) ) {
                 return true;
             }
         }
@@ -41,10 +44,32 @@ public class Files {
                 return false;
             }
         }
+        if(!createdFile(path))
+        {
+
+            return false;
+        }
         return true;
     }
 
-    public void getListFiles() {
+    public static boolean createdFile(String path) {
+
+        File newFoldr = new File(path);
+        if (!newFoldr.exists()) {
+            try {
+                boolean isCreated = newFoldr.createNewFile();
+                if (!isCreated) {
+                    System.out.println(errorCreatingFile);
+                }
+            } catch (IOException e) {
+                System.out.println(errorCreatingFile);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean getListFiles() {
         String userPatch = System.getProperty("user.dir");
         File file = new File(userPatch);
         if (file.exists()) {
@@ -55,15 +80,15 @@ public class Files {
                 }
             }
         }
-        if (filesList.size() > 0) {
-            boolean isDataFiles = true;
-        } else {
+        if (!(filesList.size() > 0)) {
             System.out.println(filesError);
+            return false;
         }
+        return true;
     }
 
-    public void readFileContents() throws IOException {
-        getListFiles();
+    public boolean readFileContents() throws IOException {
+        if (!getListFiles()) return false;
         for (String fileName : filesList) {
             try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
                 String line;
@@ -72,6 +97,7 @@ public class Files {
                 }
             }
         }
+        return true;
     }
 
     private void parseLine(String line) {
@@ -108,19 +134,11 @@ public class Files {
     }
 
     private boolean isValidManager(String[] parsingLine) {
-        return Utils.isManager(parsingLine[0]) &&
-            Utils.isInteger(parsingLine[1].trim()) &&
-            !Utils.isNumber(parsingLine[2]) &&
-            Utils.isNumber(parsingLine[3].trim()) &&
-            !Utils.isNumber(parsingLine[4]);
+        return Utils.isManager(parsingLine[0]) && Utils.isInteger(parsingLine[1].trim()) && !Utils.isNumber(parsingLine[2]) && Utils.isNumber(parsingLine[3].trim()) && !Utils.isNumber(parsingLine[4]);
     }
 
     private boolean isValidEmployee(String[] parsingLine) {
-        return Utils.isEmployee(parsingLine[0].trim()) &&
-            Utils.isInteger(parsingLine[1].trim()) &&
-            !Utils.isNumber(parsingLine[2]) &&
-            Utils.isNumber(parsingLine[3].trim()) &&
-            Utils.isNumber(parsingLine[4].trim());
+        return Utils.isEmployee(parsingLine[0].trim()) && Utils.isInteger(parsingLine[1].trim()) && !Utils.isNumber(parsingLine[2]) && Utils.isNumber(parsingLine[3].trim()) && Utils.isNumber(parsingLine[4].trim());
     }
 
     public void writeDataToFiles(List<Manager> managerList) {
@@ -149,6 +167,7 @@ public class Files {
     }
 
     private void writeErrorLogToFile() {
+        if (!(errorDataList.size() > 0)) return;
         FileWriter writer;
         File file = null;
         try {
@@ -163,25 +182,10 @@ public class Files {
         }
     }
 
-    public static boolean createdFile(String path) {
-
-        File newFoldr = new File(path);
-        if (!newFoldr.exists()) {
-            try {
-                boolean isCreated = newFoldr.createNewFile();
-                if (!isCreated) {
-                    System.out.println(errorCreatingFile);
-                }
-            } catch (IOException e) {
-                System.out.println(errorCreatingFile);
-                return false;
-            }
-        }
-        return true;
-    }
 
     public static void writeStatisticsToFile(List<String> listStatistic, String path) {
-        if (isPathRight(path)) {
+        if (!(listStatistic.size() > 1)) return;
+        if (isPathRight(path) && listStatistic.size() > 0) {
 
             File file = new File(path);
             try {
@@ -207,10 +211,6 @@ public class Files {
                 if (s != null) errorDataList.add(s);
             }
         }
-    }
-
-    public List<String> getErrorDataList() {
-        return errorDataList;
     }
 
     public List<String> getEmployeeList() {

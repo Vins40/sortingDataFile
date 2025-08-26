@@ -1,10 +1,9 @@
+import enums.OrderType;
+import enums.SortType;
 import worker.Employee;
 import worker.Manager;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SortingData {
     private final List<String> employeeList;
@@ -36,12 +35,12 @@ public class SortingData {
     }
     private void sortEmployeeInList(Manager manager) {
         List<Employee> employees = manager.getListEmployee();
-        if (valueArgs.contains(Attributs.NAME)) {
-            boolean containsDesc = valueArgs.contains(Attributs.DESС);
+        if (valueArgs.contains(SortType.NAME.name().toLowerCase())) {
+            boolean containsDesc = valueArgs.contains(OrderType.DESC.name().toLowerCase());
             employees.sort(containsDesc ? (s1, s2) -> s2.getName().compareTo(s1.getName()) :
                 Comparator.comparing(Employee::getName));
-        } else if (valueArgs.contains(Attributs.SALARY)) {
-            boolean containsDesc = valueArgs.contains(Attributs.DESС);
+        } else if (valueArgs.contains(SortType.SALARY.name().toLowerCase())) {
+            boolean containsDesc = valueArgs.contains(OrderType.DESC.name().toLowerCase());
             employees.sort(containsDesc ? (s1, s2) -> s2.getSalary().compareTo(s1.getSalary()) :
                 Comparator.comparing(Employee::getSalary));
         }

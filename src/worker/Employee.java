@@ -7,7 +7,6 @@ public class Employee {
     private final String salary;
     private final Integer identifier_m;
 
-
     public Employee(Integer identifier, String name, String salary, Integer identifier_m) {
         this.status = "Employee";
         this.identifier = identifier;

@@ -46,7 +46,7 @@ public class Statistics {
         if (Attributs.argStat && path == null) {
             consoleOutput();
         } else if (path != null) {
-            Files.writeStatisticsToFile(getListStatistic(), path);
+            MethodsForWorkWitchFiles.writeStatisticsToFile(getListStatistic(), path);
         }
     }
 
