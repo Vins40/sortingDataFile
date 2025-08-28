@@ -5,14 +5,14 @@ public class Employee {
     private final Integer identifier;
     private final String name;
     private final String salary;
-    private final Integer identifier_m;
+    private final Integer identifierM;
 
-    public Employee(Integer identifier, String name, String salary, Integer identifier_m) {
+    public Employee(Integer identifier, String name, String salary, Integer identifierM) {
         this.status = "Employee";
         this.identifier = identifier;
         this.name = name;
         this.salary = salary;
-        this.identifier_m = identifier_m;
+        this.identifierM = identifierM;
     }
 
     public String getName() {
@@ -25,6 +25,6 @@ public class Employee {
 
     @Override
     public String toString() {
-        return String.format("%s,%s,%s,%s,%s", status, identifier, name, salary, identifier_m);
+        return String.format("%s,%s,%s,%s,%s", status, identifier, name, salary, identifierM);
     }
 }

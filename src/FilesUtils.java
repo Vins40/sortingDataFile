@@ -1,72 +1,76 @@
+import utils.MathUtils;
+import utils.WorkerUtils;
 import worker.Employee;
 import worker.Manager;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MethodsForWorkWitchFiles {
+public class FilesUtils {
+    private static final String FILES_ERROR = "Files not found";
+    private static final String ERROR_CREATING_FOLDER = "Error creating folder! Please check the parameter path ";
+    private static final String ERROR_WRITING_TO_FILE = "Error writing to the file!  ";
+    private static final String ERROR_CREATING_FILE = "Error creating the file! Please check the parameter path!";
+
     private final List<String> filesList = new ArrayList();
     private final List<String> employeeList = new ArrayList();
     private final Map<String, String> managerList = new HashMap<>();
     private final List<String> departmentList = new ArrayList<>();
     private final List<String> errorDataList = new ArrayList();
 
-    private static final String filesError = "Files not found";
-    private static final String errorCreatingFolder = "Error creating folder! Please check the parameter path ";
-    private static final String errorWritingToFile = "Error writing to the file!  ";
-    private static final String errorCreatingFile = "Error creating the file! Please check the parameter path!";
-    private static final String errorDeleteDirectory = "Warning: Cannot delete directory: ";
-
     public static boolean isPathRight(String path) {
-
 
         File file = new File(path);
         if (file.exists()) {
             return true;
         } else {
-            if (createdDirectory(path) ) {
+            if (createdDirectory(path)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean createdDirectory(String path) {
-        File file = new File(path.substring(0, path.lastIndexOf('\\') + 1));
-        if (!file.isDirectory()) {
-            boolean newDirectory = file.mkdirs();
+    public static void writeStatisticsToFile(List<String> listStatistic, String path) {
+        if (!(listStatistic.size() > 1)) return;
+        if (isPathRight(path) && listStatistic.size() > 0) {
 
-            if (!newDirectory) {
-                System.out.println(errorCreatingFolder);
-                return false;
+            File file = new File(path);
+            try {
+                FileWriter writer = new FileWriter(file);
+                writer.write(Statistics.FIELD_STATISTIC + '\n');
+                for (String line : listStatistic) {
+                    writer.write("\n" + line);
+                }
+                writer.close();
+            } catch (IOException e) {
+                System.out.println(ERROR_WRITING_TO_FILE + path.substring(path.lastIndexOf('\\') + 1));
             }
         }
-        if(!createdFile(path))
-        {
-
-            return false;
-        }
-        return true;
     }
 
-    public static boolean createdFile(String path) {
+    public List<String> getEmployeeList() {
+        return employeeList;
+    }
 
-        File newFoldr = new File(path);
-        if (!newFoldr.exists()) {
-            try {
-                boolean isCreated = newFoldr.createNewFile();
-                if (!isCreated) {
-                    System.out.println(errorCreatingFile);
-                }
-            } catch (IOException e) {
-                System.out.println(errorCreatingFile);
-                return false;
-            }
+    public Map<String, String> getManagerList() {
+        return managerList;
+    }
+
+    public void writeDataToFiles(List<Manager> managerList) {
+        for (Manager manager : managerList) {
+            String PREFIX = ".sb";
+            String fileName = manager.getDepartment() + PREFIX;
+            writeDepartmentToFile(manager, fileName);
         }
-        return true;
+        writeErrorLogToFile();
     }
 
     public boolean getListFiles() {
@@ -81,7 +85,7 @@ public class MethodsForWorkWitchFiles {
             }
         }
         if (!(filesList.size() > 0)) {
-            System.out.println(filesError);
+            System.out.println(FILES_ERROR);
             return false;
         }
         return true;
@@ -96,6 +100,51 @@ public class MethodsForWorkWitchFiles {
                     parseLine(line.trim());
                 }
             }
+        }
+        return true;
+    }
+
+    public void checkEmployeeToError(List<Integer> controlList) {
+        if (controlList.size() != errorDataList.size()) {
+            List<String> copyList = new ArrayList<>(employeeList);
+            for (int i = 0; i < controlList.size(); i++) {
+                copyList.set(controlList.get(i), null);
+            }
+            for (String s : copyList) {
+                if (s != null) errorDataList.add(s);
+            }
+        }
+    }
+
+    private static boolean createdFile(String path) {
+        File newFoldr = new File(path);
+        if (!newFoldr.exists()) {
+            try {
+                boolean isCreated = newFoldr.createNewFile();
+                if (!isCreated) {
+                    System.out.println(ERROR_CREATING_FILE);
+                }
+            } catch (IOException e) {
+                System.out.println(ERROR_CREATING_FILE);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean createdDirectory(String path) {
+        File file = new File(path.substring(0, path.lastIndexOf('\\') + 1));
+        if (!file.isDirectory()) {
+            boolean newDirectory = file.mkdirs();
+
+            if (!newDirectory) {
+                System.out.println(ERROR_CREATING_FOLDER);
+                return false;
+            }
+        }
+        if (!createdFile(path)) {
+
+            return false;
         }
         return true;
     }
@@ -134,20 +183,19 @@ public class MethodsForWorkWitchFiles {
     }
 
     private boolean isValidManager(String[] parsingLine) {
-        return Utils.isManager(parsingLine[0]) && Utils.isInteger(parsingLine[1].trim()) && !Utils.isNumber(parsingLine[2]) && Utils.isNumber(parsingLine[3].trim()) && !Utils.isNumber(parsingLine[4]);
+        return WorkerUtils.isManager(parsingLine[0]) &&
+            MathUtils.isInteger(parsingLine[1].trim()) &&
+            !MathUtils.isNumber(parsingLine[2]) &&
+            MathUtils.isNumber(parsingLine[3].trim()) &&
+            !MathUtils.isNumber(parsingLine[4]);
     }
 
     private boolean isValidEmployee(String[] parsingLine) {
-        return Utils.isEmployee(parsingLine[0].trim()) && Utils.isInteger(parsingLine[1].trim()) && !Utils.isNumber(parsingLine[2]) && Utils.isNumber(parsingLine[3].trim()) && Utils.isNumber(parsingLine[4].trim());
-    }
-
-    public void writeDataToFiles(List<Manager> managerList) {
-        for (Manager manager : managerList) {
-            String PREFIX = ".sb";
-            String fileName = manager.getDepartment() + PREFIX;
-            writeDepartmentToFile(manager, fileName);
-        }
-        writeErrorLogToFile();
+        return WorkerUtils.isEmployee(parsingLine[0].trim()) &&
+            MathUtils.isInteger(parsingLine[1].trim()) &&
+            !MathUtils.isNumber(parsingLine[2]) &&
+            MathUtils.isNumber(parsingLine[3].trim()) &&
+            MathUtils.isNumber(parsingLine[4].trim());
     }
 
     private void writeDepartmentToFile(Manager manager, String fileName) {
@@ -178,46 +226,7 @@ public class MethodsForWorkWitchFiles {
             }
             writer.close();
         } catch (IOException e) {
-            System.out.println(errorCreatingFile + file.getName());
+            System.out.println(ERROR_CREATING_FILE + file.getName());
         }
-    }
-
-
-    public static void writeStatisticsToFile(List<String> listStatistic, String path) {
-        if (!(listStatistic.size() > 1)) return;
-        if (isPathRight(path) && listStatistic.size() > 0) {
-
-            File file = new File(path);
-            try {
-                FileWriter writer = new FileWriter(file);
-                writer.write(Statistics.fieldStatistic + '\n');
-                for (String line : listStatistic) {
-                    writer.write("\n" + line);
-                }
-                writer.close();
-            } catch (IOException e) {
-                System.out.println(errorWritingToFile + path.substring(path.lastIndexOf('\\') + 1));
-            }
-        }
-    }
-
-    public void checkEmployeeToError(List<Integer> controlList) {
-        if (controlList.size() != errorDataList.size()) {
-            List<String> copyList = new ArrayList<>(employeeList);
-            for (int i = 0; i < controlList.size(); i++) {
-                copyList.set(controlList.get(i), null);
-            }
-            for (String s : copyList) {
-                if (s != null) errorDataList.add(s);
-            }
-        }
-    }
-
-    public List<String> getEmployeeList() {
-        return employeeList;
-    }
-
-    public Map<String, String> getManagerList() {
-        return managerList;
     }
 }

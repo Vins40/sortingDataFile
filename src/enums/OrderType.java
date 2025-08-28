@@ -1,5 +1,6 @@
 package enums;
 
 public enum OrderType {
-    ASC,DESC
+    ASC,
+    DESC
 }

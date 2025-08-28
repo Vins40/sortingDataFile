@@ -8,16 +8,19 @@ import java.util.List;
 
 public class Statistics {
 
-    public List<String> listStatistic = new ArrayList<>();
-
-    public static final String fieldStatistic = "department, min, max, mid";
-
+    private static final int DECIMAL_PLACES = 2;
     private final List<Manager> listManager;
 
-    private static final int decimalPlaces = 2;
+    public static final String FIELD_STATISTIC = "department, min, max, mid";
+
+    public List<String> listStatistic = new ArrayList<>();
 
     public Statistics(List<Manager> workerInDepartment) {
         this.listManager = workerInDepartment;
+    }
+
+    public List<String> getListStatistic() {
+        return listStatistic;
     }
 
     public void getStatistics(String path) {
@@ -46,23 +49,19 @@ public class Statistics {
         if (Attributs.argStat && path == null) {
             consoleOutput();
         } else if (path != null) {
-            MethodsForWorkWitchFiles.writeStatisticsToFile(getListStatistic(), path);
+            FilesUtils.writeStatisticsToFile(getListStatistic(), path);
         }
     }
 
     public void consoleOutput() {
-        System.out.println(fieldStatistic);
+        System.out.println(FIELD_STATISTIC);
         System.out.println();
         listStatistic.forEach(System.out::println);
     }
 
-    public List<String> getListStatistic() {
-        return listStatistic;
-    }
-
     public BigDecimal roundOff(Float value) {
         BigDecimal bd = new BigDecimal(value);
-        return bd.setScale(decimalPlaces, RoundingMode.CEILING);
+        return bd.setScale(DECIMAL_PLACES, RoundingMode.CEILING);
 
     }
 }

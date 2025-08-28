@@ -1,6 +1,8 @@
-public class Utils {
+package utils;
 
-    private Utils() {
+public final class MathUtils {
+
+    private MathUtils() {
     }
 
     public static boolean isNumber(String number) {
@@ -17,15 +19,5 @@ public class Utils {
         } catch (NumberFormatException e) {
             return false;
         }
-    }
-
-    public static boolean isEmployee(String worker) {
-
-        return worker.equals("Employee");
-    }
-
-    public static boolean isManager(String worker) {
-
-        return worker.equals("Manager");
     }
 }
