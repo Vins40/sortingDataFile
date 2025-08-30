@@ -26,16 +26,12 @@ public class FilesUtils {
     private final List<String> errorDataList = new ArrayList();
 
     public static boolean isPathRight(String path) {
-
         File file = new File(path);
         if (file.exists()) {
             return true;
         } else {
-            if (createdDirectory(path)) {
-                return true;
-            }
+            return createdDirectoryAndFile(path);
         }
-        return false;
     }
 
     public static void writeStatisticsToFile(List<String> listStatistic, String path) {
@@ -66,8 +62,8 @@ public class FilesUtils {
 
     public void writeDataToFiles(List<Manager> managerList) {
         for (Manager manager : managerList) {
-            String PREFIX = ".sb";
-            String fileName = manager.getDepartment() + PREFIX;
+            String prefix = ".sb";
+            String fileName = manager.getDepartment() + prefix;
             writeDepartmentToFile(manager, fileName);
         }
         writeErrorLogToFile();
@@ -116,11 +112,27 @@ public class FilesUtils {
         }
     }
 
+    private static boolean createdDirectoryAndFile(String path) {
+
+        File file = new File(path);
+        File parentDir = file.getParentFile();
+
+        if (parentDir != null && !parentDir.exists()) {
+            if (!parentDir.mkdirs()) {
+                System.out.println(ERROR_CREATING_FOLDER);
+                return false;
+            }
+        }
+        return createdFile(path);
+    }
+
     private static boolean createdFile(String path) {
         File newFoldr = new File(path);
+
         if (!newFoldr.exists()) {
             try {
                 boolean isCreated = newFoldr.createNewFile();
+
                 if (!isCreated) {
                     System.out.println(ERROR_CREATING_FILE);
                 }
@@ -132,35 +144,19 @@ public class FilesUtils {
         return true;
     }
 
-    private static boolean createdDirectory(String path) {
-        File file = new File(path.substring(0, path.lastIndexOf('\\') + 1));
-        if (!file.isDirectory()) {
-            boolean newDirectory = file.mkdirs();
-
-            if (!newDirectory) {
-                System.out.println(ERROR_CREATING_FOLDER);
-                return false;
-            }
-        }
-        if (!createdFile(path)) {
-
-            return false;
-        }
-        return true;
-    }
-
     private void parseLine(String line) {
         String[] parsingLine = line.split(",");
+
         if (parsingLine.length != 5) {
             errorDataList.add(line);
             return;
         }
+
         for (int i = 0; i < parsingLine.length; i++) {
             parsingLine[i] = parsingLine[i].trim();
         }
         if (isValidManager(parsingLine)) {
             checkToManagerFromOneDepartment(parsingLine, line);
-
         } else if (isValidEmployee(parsingLine)) {
             employeeList.add(line.trim());
         } else {
@@ -170,6 +166,7 @@ public class FilesUtils {
 
     private void checkToManagerFromOneDepartment(String[] parsingLine, String line) {
         String department = parsingLine[4];
+
         if (!departmentList.contains(department)) {
             managerList.put(department, line);
             departmentList.add(department);
@@ -215,9 +212,11 @@ public class FilesUtils {
     }
 
     private void writeErrorLogToFile() {
-        if (!(errorDataList.size() > 0)) return;
         FileWriter writer;
         File file = null;
+
+        if (!(errorDataList.size() > 0)) return;
+
         try {
             file = new File("error.log");
             writer = new FileWriter(file, false);

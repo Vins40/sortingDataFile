@@ -8,6 +8,7 @@ import java.util.Set;
 public class Attributs {
 
     public enum OutputType {FILE, CONSOLE}
+
     public enum ArgumentType {SORT, ORDER, STAT, OUTPUT, PATH, UNKNOWN}
 
     private static final String SEPARATOR = "=";
@@ -25,13 +26,16 @@ public class Attributs {
     private static final Set<String> VALID_OUTPUT_ARGUMENT = Set.of(OutputType.CONSOLE.name().toLowerCase(),
         OutputType.FILE.name().toLowerCase());
 
-    public static boolean argStat = false;
-    private boolean argSort = false;
-    private boolean argOutputFile = false;
+    private static boolean argStat = false;
+    private static boolean argSort = false;
+    private static boolean argOutputFile = false;
 
     private final List<String> valueArgsSort = new ArrayList<>();
     private String valueArgsPath;
 
+    public static boolean isArgStat() {
+        return argStat;
+    }
 
     public List<String> getValueArgsSort() {
         return valueArgsSort;
@@ -40,6 +44,7 @@ public class Attributs {
     public String getValueArgsPath() {
         return valueArgsPath;
     }
+
     public void setArgs(String[] args) {
         for (String parameter : args) {
             try {
@@ -61,17 +66,18 @@ public class Attributs {
     }
 
     private ArgumentType getArgumentType(String parameter) {
-        String SORT_Short = "s";
-        String OUTPUT_Short = "o";
+        String sortShort = "s";
+        String outputShort = "o";
+
         if (parameter.startsWith(TO_DASH + ArgumentType.SORT.name().toLowerCase() + SEPARATOR) ||
-            parameter.startsWith(DASH + SORT_Short + SEPARATOR))
+            parameter.startsWith(DASH + sortShort + SEPARATOR))
             return ArgumentType.SORT;
         if (parameter.startsWith(TO_DASH + ArgumentType.ORDER.name().toLowerCase() + SEPARATOR))
             return ArgumentType.ORDER;
         if (parameter.equals(TO_DASH + ArgumentType.STAT.name().toLowerCase()))
             return ArgumentType.STAT;
         if (parameter.startsWith(TO_DASH + ArgumentType.OUTPUT.name().toLowerCase() + SEPARATOR) ||
-            parameter.startsWith(DASH + OUTPUT_Short + SEPARATOR))
+            parameter.startsWith(DASH + outputShort + SEPARATOR))
             return ArgumentType.OUTPUT;
         if (parameter.startsWith(TO_DASH + ArgumentType.PATH.name().toLowerCase() + SEPARATOR))
             return ArgumentType.PATH;
@@ -121,7 +127,6 @@ public class Attributs {
             argStat = false;
         }
         valueArgsPath = attributValue(currentParameter);
-
     }
 
     private void gettingUnknownArgument(String currentParameter) {
@@ -150,6 +155,4 @@ public class Attributs {
         int valueSeparator = s.indexOf(SEPARATOR);
         return s.substring(valueSeparator + 1);
     }
-
-
 }

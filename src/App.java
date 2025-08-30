@@ -11,7 +11,7 @@ public class App {
             sorting.sortingWorkerToDepartment();
             files.checkEmployeeToError(sorting.getControlList());
 
-            if (Attributs.argStat) {
+            if (Attributs.isArgStat()) {
                 Statistics statistics = new Statistics(sorting.getWorkerInDepartment());
                 statistics.getStatistics(attributs.getValueArgsPath());
             }

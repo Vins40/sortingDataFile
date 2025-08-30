@@ -9,11 +9,11 @@ import java.util.List;
 public class Statistics {
 
     private static final int DECIMAL_PLACES = 2;
-    private final List<Manager> listManager;
-
     public static final String FIELD_STATISTIC = "department, min, max, mid";
 
-    public List<String> listStatistic = new ArrayList<>();
+    private final List<Manager> listManager;
+    private final List<String> listStatistic = new ArrayList<>();
+
 
     public Statistics(List<Manager> workerInDepartment) {
         this.listManager = workerInDepartment;
@@ -46,7 +46,7 @@ public class Statistics {
 
         listStatistic.sort(String::compareTo);
 
-        if (Attributs.argStat && path == null) {
+        if (Attributs.isArgStat() && path == null) {
             consoleOutput();
         } else if (path != null) {
             FilesUtils.writeStatisticsToFile(getListStatistic(), path);
