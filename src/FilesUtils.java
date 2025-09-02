@@ -23,7 +23,7 @@ public class FilesUtils {
     private final List<String> employeeList = new ArrayList();
     private final Map<String, String> managerList = new HashMap<>();
     private final List<String> departmentList = new ArrayList<>();
-    private final List<String> errorDataList = new ArrayList();
+    private static final List<String> errorDataList = new ArrayList();
 
     public static boolean isPathRight(String path) {
         File file = new File(path);
@@ -100,16 +100,9 @@ public class FilesUtils {
         return true;
     }
 
-    public void checkEmployeeToError(List<Integer> controlList) {
-        if (controlList.size() != errorDataList.size()) {
-            List<String> copyList = new ArrayList<>(employeeList);
-            for (int i = 0; i < controlList.size(); i++) {
-                copyList.set(controlList.get(i), null);
-            }
-            for (String s : copyList) {
-                if (s != null) errorDataList.add(s);
-            }
-        }
+    public static void addEmployeeWithoutDepartment (String employee)
+    {
+        errorDataList.add(employee);
     }
 
     private static boolean createdDirectoryAndFile(String path) {
