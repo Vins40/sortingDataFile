@@ -32,9 +32,10 @@ public class Statistics {
                 float min = Float.MAX_VALUE;
                 float mid = 0;
                 for (Employee employee : manager.getListEmployee()) {
-                    if (Float.parseFloat(employee.getSalary()) > max) max = Float.parseFloat(employee.getSalary());
-                    if (Float.parseFloat(employee.getSalary()) < min) min = Float.parseFloat(employee.getSalary());
-                    mid += Float.parseFloat(employee.getSalary());
+                    float salary = Float.parseFloat(employee.getSalary());
+                    if (salary > max) max = salary;
+                    if (salary < min) min = salary;
+                    mid += salary;
                 }
                 mid = mid / manager.getListEmployee().size();
 

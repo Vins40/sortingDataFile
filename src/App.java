@@ -2,6 +2,7 @@ import java.io.IOException;
 
 public class App {
     public static void main(String[] args) throws IOException {
+
         Attributs attributs = new Attributs();
         attributs.setArgs(args);
         FilesUtils files = new FilesUtils();
