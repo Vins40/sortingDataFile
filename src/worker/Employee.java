@@ -15,6 +15,10 @@ public class Employee {
         this.identifierM = identifierM;
     }
 
+    public Integer getIdentifierM() {
+        return identifierM;
+    }
+
     public String getName() {
         return name;
     }

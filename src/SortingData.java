@@ -20,55 +20,51 @@ public class SortingData {
 
     public void sortingWorkerToDepartment() {
 
-        getCreatManagerToMap();
+        managerList.values().stream()
+            .map(this::parseManager)
+            .filter(Objects::nonNull)
+            .forEach(manager ->
+            {
+                managerMap.put(manager.getIdentifier().toString(), manager);
+                workerInDepartment.add(manager);
+            });
 
-        sortingEmployeeToManager();
-
-        sortEmployeeIfNeeded();
-    }
-
-    private void getCreatManagerToMap() {
-        for (String managerLine : managerList.values()) {
-            String[] managerData = managerLine.split(",", 5);
-            String targetIdentifier = managerData[1].trim();
-            Manager manager = new Manager(Integer.parseInt(targetIdentifier),
-                managerData[2].trim(),
-                managerData[3].trim(),
-                managerData[4].trim());
-            managerMap.put(targetIdentifier, manager);
-            workerInDepartment.add(manager);
-        }
-    }
-
-    private void sortingEmployeeToManager() {
         for (String employeeLine : employeeList) {
-            String[] employeeData = employeeLine.split(",", 5);
-            String targetIdentifier = employeeData[4].trim();
+            Employee employee = parseEmployee(employeeLine);
+            String targetIdentifier = employee.getIdentifierM().toString();
             Manager manager = managerMap.get(targetIdentifier);
             if (manager != null) {
-                Employee employee = creatEmployee(employeeData);
                 manager.addEmployee(employee);
             } else {
                 FilesUtils.addEmployeeWithoutDepartment(employeeLine);
             }
         }
+
+        if (valueArgs.isEmpty()) {
+            Comparator<Employee> comparator = createComparator();
+            workerInDepartment.forEach(manager -> manager.getListEmployee().sort(comparator));
+        }
     }
 
-    private Employee creatEmployee(String[] employeeData) {
+    private Manager parseManager(String managerLine) {
+        try {
+            String[] managerData = managerLine.split(",", 5);
+            return new Manager(Integer.parseInt(managerData[1].trim()),
+                managerData[2].trim(),
+                managerData[3].trim(),
+                managerData[4].trim());
+        } catch (Exception ignored) {
+
+        }
+        return null;
+    }
+
+    private Employee parseEmployee(String employeeLine) {
+        String[] employeeData = employeeLine.split(",", 5);
         return new Employee(Integer.parseInt(employeeData[1].trim()),
             employeeData[2].trim(),
             employeeData[3].trim(),
             Integer.parseInt(employeeData[4].trim()));
-    }
-
-    private void sortEmployeeIfNeeded() {
-        if (valueArgs.isEmpty()) return;
-        Comparator<Employee> comparator = createComparator();
-        for (Manager manager : workerInDepartment) {
-            if (!manager.getListEmployee().isEmpty()) {
-                manager.getListEmployee().sort(comparator);
-            }
-        }
     }
 
     private Comparator<Employee> createComparator() {
@@ -87,5 +83,4 @@ public class SortingData {
     public List<Manager> getWorkerInDepartment() {
         return workerInDepartment;
     }
-
 }
